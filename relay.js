@@ -28,11 +28,17 @@ async function main () {
       noise()
     ],
     streamMuxers: [
-      yamux(),mplex()
+      yamux({
+        maxMessageSize: 1 << 20 // 1 MB
+      })
     ],
     services: {
       identify: identifyService(),
-      relay: circuitRelayServer(),
+      relay: circuitRelayServer({
+        reservations: {
+          defaultDataLimit: BigInt(1 << 20), // the default maximum number of bytes that can be transferred over a relayed connection
+        }
+      }),
       pubsub: floodsub() 
     },
     peerDiscovery: [
